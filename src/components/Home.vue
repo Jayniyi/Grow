@@ -1,3 +1,4 @@
+
 <script setup>
 import Navbar from '@/components/Navbar.vue'
 import HeroSection from '@/components/Hero.vue'
@@ -5,6 +6,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
+import BeforeAfterSlider from '@/components/Before.vue'
 
 // Register GSAP ScrollTrigger
 gsap.registerPlugin(ScrollTrigger)
@@ -51,7 +53,7 @@ const plans = ref([
   {
     name: 'Premium',
     monthlyPrice: '$199',
-    yearlyPrice: '$2268', // 5% discount: $199 * 12 * 0.95 = $2268.6, rounded to $2268
+    yearlyPrice: '$2268',
     icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.915a1 1 0 00.95-.69l1.519-4.674z',
     link: '/signup?plan=premium',
     features: [
@@ -71,7 +73,7 @@ const plans = ref([
 // Toggle between monthly and yearly pricing
 const isYearly = ref(false)
 
-// Testimonial data (single placeholder)
+// Testimonial data
 const testimonials = ref([
   {
     name: 'A Happy Customer',
@@ -80,7 +82,6 @@ const testimonials = ref([
     image: 'https://via.placeholder.com/100',
   },
 ])
-
 
 // Tips data with hover notes
 const tipsContent = ref([
@@ -120,7 +121,6 @@ const tips = [
 ]
 
 const faqQuestions = ref([
-
   {
     question: 'What specific services does Growlix offer to help me grow my business significantly?',
     answer: 'We provide Google Maps optimization, custom website development, social media ad campaigns, branding materials, and advanced analytics to drive your business growth.',
@@ -145,15 +145,11 @@ const faqQuestions = ref([
     question: 'How quickly can I expect to see results after using Growlix services?',
     answer: 'Our optimized strategies typically deliver noticeable improvements in your online visibility within a few weeks, depending on your starting point and plan.',
   },
-
 ])
-
-
 
 const toggleFAQ = (id) => {
   faqOpen.value = faqOpen.value === id ? null : id
 }
-
 
 const showRandomTip = () => {
   randomTip.value = tips[Math.floor(Math.random() * tips.length)]
@@ -164,65 +160,20 @@ const showRandomTip = () => {
   )
 }
 
-// Quiz logic
-const questions = ref([
-  {
-    text: 'Which platform is best for targeting local customers?',
-    options: ['Facebook', 'Google Ads', 'Instagram', 'X'],
-    answer: 1,
-  },
-  {
-    text: 'How often should you update your website content?',
-    options: ['Monthly', 'Quarterly', 'Yearly', 'Never'],
-    answer: 0,
-  },
-  {
-    text: 'What’s the most effective SEO strategy?',
-    options: ['Frequent Images', 'Keyword Optimization', 'Bright Colors', 'Large Fonts'],
-    answer: 1,
-  },
-])
-const currentQuestion = ref(null)
-const selectedAnswer = ref(null)
-const score = ref(null)
-
-const startQuiz = () => {
-  if (questions.value.length > 0) {
-    currentQuestion.value = 0
-    selectedAnswer.value = null
-    score.value = null
-  }
-}
-
-const selectAnswer = (index) => {
-  selectedAnswer.value = index
-}
-
-const nextQuestion = () => {
-  if (selectedAnswer.value === questions.value[currentQuestion.value]?.answer) {
-    score.value = (score.value || 0) + 1
-  }
-  if (currentQuestion.value >= questions.value.length - 1) {
-    currentQuestion.value = null
-  } else {
-    currentQuestion.value++
-    selectedAnswer.value = null
-  }
-}
-
 // Scroll and hover animations
 onMounted(() => {
-  gsap.utils.toArray('.section').forEach((section) => {
+  // Ensure BeforeAfterSlider persists by excluding it from ScrollTrigger animations
+  gsap.utils.toArray('.section:not(.carousel-section)').forEach((section) => {
     gsap.from(section, {
       opacity: 0,
       y: 50,
-      duration: 1,
+      duration: 0.8,
       ease: 'power3.out',
       scrollTrigger: {
         trigger: section,
         start: 'top 80%',
         end: 'bottom 20%',
-        toggleActions: 'play none none reverse',
+        toggleActions: 'play none none none', // Changed to prevent reverse hiding
       },
     })
   })
@@ -248,27 +199,17 @@ onMounted(() => {
     const onLeave = () => gsap.to(note, { opacity: 0, y: 10, duration: 0.3, ease: 'power2.in' })
     card.addEventListener('mouseenter', onEnter)
     card.addEventListener('mouseleave', onLeave)
-    // Store for cleanup
     card._gsapEvents = { onEnter, onLeave }
   })
+
+  // Ensure carousel persists on scroll
+  gsap.from('.carousel-section', {
+    opacity: 1, // Keep visible
+    duration: 0.8,
+    ease: 'power3.out',
+  })
 })
-const TipsContent = ref([
-  {
-    title: '5 Tips to Boost Google Maps',
-    description: 'Learn how to increase your local visibility with these expert strategies.',
-    note: 'Update your listing weekly for best results!',
-  },
-  {
-    title: 'Effective Flyer Design',
-    description: 'Create flyers that grab attention and drive customer engagement.',
-    note: 'Use bold colors to stand out!',
-  },
-  {
-    title: 'Ad Campaign Strategies',
-    description: 'Maximize your ROI with targeted ads on multiple platforms.',
-    note: 'Test different platforms to find your sweet spot!',
-  },
-]);
+
 onUnmounted(() => {
   gsap.utils.toArray('.tip-card').forEach((card) => {
     if (card._gsapEvents) {
@@ -278,7 +219,6 @@ onUnmounted(() => {
     }
   })
 })
-
 </script>
 
 <template>
@@ -287,7 +227,10 @@ onUnmounted(() => {
     <Navbar />
     <HeroSection />
 
-    <!-- Platform Benefits Section -->
+    <!-- Carousel Section -->
+    <section class="carousel-section py-20 bg-gradient-to-b from-white to-gray-50">
+    </section>
+
     <!-- Platform Benefits Section -->
     <section class="py-20 bg-gradient-to-b from-white to-gray-50 section">
       <div class="container mx-auto px-4 text-center">
@@ -353,7 +296,6 @@ onUnmounted(() => {
             </p>
           </div>
         </div>
-        <!-- Rest of the section remains unchanged -->
       </div>
     </section>
 
@@ -375,10 +317,10 @@ onUnmounted(() => {
             <button
               @click="isYearly = false"
               :class="[
-                'px-6 py-2  sm:px-8 sm:py-3 rounded-full font-semibold transition-all duration-300',
+                'px-6 py-2 sm:px-8 sm:py-3 rounded-full font-semibold transition-all duration-300',
                 !isYearly
-                  ? 'bg-gradient-to-r from-orange-500 bg-orange-500 to-green-500 text-white shadow-lg scale-105'
-                  : 'text-gray-600  hover:text-gray-800 bg-gray-200',
+                  ? 'bg-gradient-to-r from-orange-500 to-green-500 text-orange-500 shadow-lg scale-105'
+                  : 'text-gray-600 hover:text-gray-800 bg-gray-200',
               ]"
               aria-pressed="!isYearly"
             >
@@ -387,18 +329,17 @@ onUnmounted(() => {
             <button
               @click="isYearly = true"
               :class="[
-                'px-6 py-2 sm:px-8  sm:py-3 rounded-full font-semibold transition-all duration-300',
+                'px-6 py-2 sm:px-8 sm:py-3 rounded-full font-semibold transition-all duration-300',
                 isYearly
-                  ? 'bg-gradient-to-r bg-orange-500 from-orange-500 to-green-500 text-white shadow-lg scale-105'
-                  : 'text-gray-600  hover:text-gray-800 bg-gray-200',
+                  ? 'bg-gradient-to-r from-orange-500 bg-orange-500 to-green-500 text-white shadow-lg scale-105'
+                  : ' text-grey-300 ',
               ]"
               aria-pressed="isYearly"
             >
               Yearly Billing
               <span
-                class="text-xs bg-green-600 bg-orange-500 text-white py-1 px-2 rounded-full ml-2"
-                >Save 5%</span
-              >
+                class="text-xs bg-green-600 text-white py-1 px-2 rounded-full ml-2"
+              >Save 5%</span>
             </button>
           </div>
         </div>
@@ -408,7 +349,7 @@ onUnmounted(() => {
             :key="index"
             class="card backdrop-blur-lg p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 relative overflow-hidden border-2"
             :class="{
-              'border-orange-300 ': !plan.recommended,
+              'border-orange-300': !plan.recommended,
               'border-cyan-400': plan.recommended,
             }"
           >
@@ -479,9 +420,9 @@ onUnmounted(() => {
             </ul>
             <RouterLink
               :to="plan.link"
-              class="block px-6 py-3 bg-orange-500 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              class="block px-6 py-3 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               :class="{
-                'bg-gradient-to-r from-orange-500 bg-orange-500 to-green-500 hover:from-orange-600 hover:to-green-600 text-white': true,
+                'bg-gradient-to-r from-orange-500 to-green-500 hover:from-orange-600 hover:to-green-600 text-white bg-orange-500': true,
               }"
             >
               {{ plan.recommended ? 'Get Started Today' : 'Choose Plan' }}
@@ -492,7 +433,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- Testimonials Section (Minimal) -->
+    <!-- Testimonials Section -->
     <section class="py-20 bg-gradient-to-b from-white to-gray-50 section overflow-hidden">
       <div class="container mx-auto px-4 text-center">
         <h2
@@ -508,11 +449,13 @@ onUnmounted(() => {
             class="card bg-white/80 backdrop-blur-lg p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative overflow-hidden group"
           >
             <div
-              class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden  ring-orange-200/50"
+              class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden ring-orange-200/50"
             >
               <img
                 src="../assets/img/fce.jpg"
-               
+                alt="A Happy Customer"
+                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
+              />
             </div>
             <div class="text-center">
               <p
@@ -527,9 +470,8 @@ onUnmounted(() => {
               class="absolute -bottom-10 -right-10 w-32 h-32 bg-gradient-to-br from-orange-500 to-green-500 opacity-20 rounded-full blur-xl group-hover:opacity-40 transition-opacity duration-300"
             ></div>
           </div>
-          <!-- Add more testimonial cards as needed -->
           <div
-            class="card bg-white/80  p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative overflow-hidden group"
+            class="card bg-white/80 backdrop-blur-lg p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative overflow-hidden group"
           >
             <div
               class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden ring-orange-200/50"
@@ -557,7 +499,7 @@ onUnmounted(() => {
             class="card bg-white/80 backdrop-blur-lg p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative overflow-hidden group"
           >
             <div
-              class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden  ring-orange-200/50"
+              class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden ring-orange-200/50"
             >
               <img
                 src="../assets/img/test2.jpg"
@@ -584,297 +526,208 @@ onUnmounted(() => {
     </section>
 
     <!-- About the Founder Section -->
-<section class="py-20 bg-gradient-to-b from-gray-900 to-gray-700 text-white section overflow-hidden">
-  <div class="container mx-auto px-4 text-center relative bg">
-    <h2 class="text-3xl md:text-4xl font-bold mb-8 text-orange-500 animate-fade-in">
-      The Visionary Behind Growlix
-    </h2>
-    <div class="max-w-sm mx-auto relative z-10 ">
-      <div
-        class=" overflow-hidden p-5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 border-2 border-orange-500"
-      >
-        <div class="w-24 h-24 md:w-28 md:h-28 mx-auto mb-4 rounded-full overflow-hidden">
-          <img
-            src="../assets/img/ceo.jpg" 
-            alt="Founder"
-            class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-300"
-
-          />
-        </div>
-        <h3 class=" text-gray-600 text-xl md:text-2xl font-bold  mb-2">Obasan Joseph Olaniyi</h3> <!-- Hardcoded name -->
-        <p class="text-gray-600 mb-3">Developer & Cybersecurity Enthusiast</p> <!-- Hardcoded role -->
-        <p class="text-gray-800 text-sm md:text-base leading-relaxed">
-          As a Computer Science graduate, I’m channeling my expertise into Growlix, blending innovative development skills with a growing focus on cybersecurity. My mission is to secure and empower businesses with cutting-edge growth tools, making success accessible and safe for all.
-        </p>
-      </div>
-    </div>
-    <RouterLink
-      to="/about"
-      class="mt-6 inline-block bg-gradient-to-r bg-orange-600 from-orange-500 to-green-500 text-white px-4 py-2 md:px-5 md:py-2 rounded-full hover:from-orange-600 hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 animate-bounce-slow"
-    >
-      Discover My Journey
-    </RouterLink>
-    <div class="absolute -top-8 -left-8 w-40 h-40 bg-green-400/10 rounded-full blur-xl opacity-50 animate-blob"></div>
-    <div class="absolute -bottom-8 -right-8 w-52 h-52 bg-orange-400/10 rounded-full blur-xl opacity-50 animate-blob delay-2000"></div>
-  </div>
-</section>
-    <!-- Growth Hacks & Insights Section -->
-<section class="py-20 bg-white section overflow-hidden">
-  <div class="container mx-auto px-4 text-center">
-    <h2
-      class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-green-500"
-    >
-      Growth Hacks <span class="text-orange-500">&</span>  Insights
-    </h2>
-    <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
-      Discover expert tips to skyrocket your business success.
-    </p>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div
-        v-for="(tip, index) in TipsContent"
-        :key="index"
-        class="tip-card card bg-white/80 backdrop-blur-lg p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative group"
-      >
-        <img
-          v-if="index === 0"
-          src="../assets/img/Boost-map.jpg"
-          alt="Boost Google Maps"
-          class="w-full h-48 object-cover rounded-xl mb-6"
-          loading="lazy"
-        />
-        <img
-          v-if="index === 1"
-          src="../assets/img/boost2.jpg"
-          alt="Effective Flyers"
-          class="w-full h-48   rounded-xl mb-6"
-          loading="lazy"
-        />
-        <img
-          v-if="index === 2"
-          src="../assets/img/ads.jpg"
-          alt="Ad Campaign Strategies"
-          class="w-full h-48 object-cover rounded-xl mb-6"
-          loading="lazy"
-        />
-        <h3 class="text-xl font-semibold text-gray-900 mb-4">{{ tip.title }}</h3>
-        <p class="text-gray-600 mb-6">{{ tip.description }}</p>
-      </div>
-    </div>
-
-    <a
-      href="#discover-more"
-      class="mt-8 inline-block bg-orange-500 text-white px-8 py-4 rounded-full hover:bg-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-    >
-      Discover More
-    </a>
-  </div>
-</section>
-
-    <!-- FAQ Section -->
-<section class="py-20 bg-gradient-to-b from-white to-orange-50 section overflow-hidden">
-  <div class="container mx-auto px-4 text-center relative">
-    <h2
-      class="text-4xl md:text-5xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-green-600 animate-pulse-slow drop-shadow-lg"
-    >
-      Your Questions, Answered
-    </h2>
-    <p class="text-lg md:text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
-      Find answers to common questions or ask us directly for personalized support.
-    </p>
-    <div class="max-w-5xl mx-auto">
-      <div class="flex flex-col md:flex-row justify-between gap-6">
-        <!-- Left Column (3 FAQs) -->
-        <div class="w-full md:w-1/2 space-y-2">
+    <section class="py-20 bg-gradient-to-b from-gray-900 to-gray-700 text-white section overflow-hidden">
+      <div class="container mx-auto px-4 text-center relative">
+        <h2 class="text-3xl md:text-4xl font-bold mb-8 text-orange-500 animate-fade-in">
+          The Visionary Behind Growlix
+        </h2>
+        <div class="max-w-sm mx-auto relative z-10">
           <div
-            v-for="(faq, index) in faqQuestions.slice(0, 3)"
-            :key="index"
-            class="card bg-white/90 backdrop-blur-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-102"
+            class="overflow-hidden p-5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 border-2 border-orange-500"
           >
-            <button
-              @click="toggleFAQ(index + 1)"
-              class="w-full text-left p-6 text-gray-900 font-semibold text-lg focus:outline-none flex justify-between items-center hover:bg-orange-50/50 transition-colors duration-300"
-              :aria-expanded="faqOpen === index + 1"
-              :aria-controls="'faq-' + index"
-            >
-              <span>{{ faq.question }}</span>
-              <span
-                :class="{ 'rotate-180': faqOpen === index + 1 }"
-                class="transform transition-transform duration-300"
-              >
-                <svg
-                  class="w-6 h-6 text-orange-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </span>
-            </button>
-            <transition name="faq-slide">
-              <div
-                v-if="faqOpen === index + 1"
-                :id="'faq-' + index"
-                class="p-6 text-gray-700 bg-gradient-to-b from-white to-gray-50"
-              >
-                {{ faq.answer }}
-              </div>
-            </transition>
+            <div class="w-24 h-24 md:w-28 md:h-28 mx-auto mb-4 rounded-full overflow-hidden">
+              <img
+                src="../assets/img/ceo.jpg"
+                alt="Founder"
+                class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-300"
+              />
+            </div>
+            <h3 class="text-gray-600 text-xl md:text-2xl font-bold mb-2">Obasan Joseph Olaniyi</h3>
+            <p class="text-gray-600 mb-3">Developer & Cybersecurity Enthusiast</p>
+            <p class="text-gray-800 text-sm md:text-base leading-relaxed">
+              As a Computer Science graduate, I’m channeling my expertise into Growlix, blending innovative development skills with a growing focus on cybersecurity. My mission is to secure and empower businesses with cutting-edge growth tools, making success accessible and safe for all.
+            </p>
           </div>
         </div>
-        <!-- Right Column (3 FAQs) -->
-        <div class="w-full md:w-1/2 space-y-2">
-          <div
-            v-for="(faq, index) in faqQuestions.slice(3, 6)"
-            :key="index + 3"
-            class="card bg-white/90 backdrop-blur-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-102"
-          >
-            <button
-              @click="toggleFAQ(index + 4)"
-              class="w-full text-left p-6 text-gray-900 font-semibold text-lg focus:outline-none flex justify-between items-center hover:bg-orange-50/50 transition-colors duration-300"
-              :aria-expanded="faqOpen === index + 4"
-              :aria-controls="'faq-' + (index + 3)"
-            >
-              <span>{{ faq.question }}</span>
-              <span
-                :class="{ 'rotate-180': faqOpen === index + 4 }"
-                class="transform transition-transform duration-300"
-              >
-                <svg
-                  class="w-6 h-6 text-orange-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </span>
-            </button>
-            <transition name="faq-slide">
-              <div
-                v-if="faqOpen === index + 4"
-                :id="'faq-' + (index + 3)"
-                class="p-6 text-gray-700 bg-gradient-to-b from-white to-gray-50"
-              >
-                {{ faq.answer }}
-              </div>
-            </transition>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-    <!-- Business Growth Quiz Section -->
-<section class="py-24 bg-gradient-to-b from-orange-50 to-green-50 section overflow-hidden">
-  <div class="container mx-auto px-4 text-center relative">
-    <h2
-      class="text-4xl md:text-5xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-green-600 animate-fade-in drop-shadow-md"
-    >
-      Boost Your Business IQ
-    </h2>
-    <p class="text-lg md:text-xl text-gray-700 mb-12 max-w-xl mx-auto font-light">
-      Take our fun quiz to test your growth knowledge and unlock expert tips!
-    </p>
-    <div
-      class="quiz-container max-w-2xl mx-auto bg-white/95 backdrop-blur-md p-6 md:p-10 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-orange-200/50"
-    >
-      <div
-        v-if="currentQuestion !== null && questions.value[currentQuestion.value]"
-        class="space-y-8"
-      >
-        <p class="text-2xl md:text-3xl text-gray-900 font-semibold mb-6 animate-slide-up">
-          {{ questions.value[currentQuestion.value].text }}
-        </p>
-        <div class="grid grid-cols-1 gap-3">
-          <button
-            v-for="(option, index) in questions.value[currentQuestion.value].options"
-            :key="index"
-            @click="selectAnswer(index)"
-            :class="`answer-${index} w-full bg-gradient-to-r from-orange-100 to-green-100 text-gray-800 px-6 py-4 rounded-xl hover:from-orange-200 hover:to-green-200 transition-all duration-300 flex items-center justify-between transform hover:scale-105 ${selectedAnswer.value === index ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' : ''}`"
-          >
-            <span class="font-medium">{{ option }}</span>
-            <span v-if="selectedAnswer.value === index" class="flex-shrink-0">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </span>
-          </button>
-        </div>
-        <button
-          v-if="selectedAnswer.value !== null"
-          @click="nextQuestion"
-          class="w-full bg-gradient-to-r from-orange-500 to-green-500 text-white px-6 py-3 rounded-xl hover:from-orange-600 hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 animate-pulse-slow"
-        >
-          {{
-            currentQuestion.value === questions.value.length - 1
-              ? 'See Results'
-              : 'Next Question'
-          }}
-        </button>
-      </div>
-      <div
-        v-else-if="score !== null && score.value !== null"
-        class="space-y-8 text-center"
-      >
-        <p class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 animate-pop-in">
-          Your Score: {{ score.value }} / {{ questions.value.length }}
-        </p>
-        <p class="text-lg md:text-xl text-gray-700 mb-6 animate-fade-in-delay">
-          {{
-            score.value === questions.value.length
-              ? 'Perfect score! You’re a growth guru!'
-              : 'Great effort! Let’s grow even more with Growlix!'
-          }}
-        </p>
         <RouterLink
-          to="/signup"
-          class="inline-block bg-gradient-to-r from-orange-500 to-green-500 text-white px-6 py-3 rounded-xl hover:from-orange-600 hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 animate-pulse-slow"
+          to="/about"
+          class="mt-6 inline-block bg-gradient-to-r from-orange-500 to-green-500 bg-orange-500 text-white px-4 py-2 md:px-5 md:py-2 rounded-full hover:from-orange-600 hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 animate-bounce-slow"
         >
-          Start Growing Now
+          Discover My Journey
         </RouterLink>
+        <div class="absolute -top-8 -left-8 w-40 h-40 bg-green-400/10 rounded-full blur-xl opacity-50 animate-blob"></div>
+        <div class="absolute -bottom-8 -right-8 w-52 h-52 bg-orange-400/10 rounded-full blur-xl opacity-50 animate-blob delay-2000"></div>
       </div>
-      <div v-else class="text-center">
-        <button
-          @click="startQuiz"
-          class="bg-gradient-to-r from-orange-500 to-green-500 text-white px-6 py-3 rounded-xl hover:from-orange-600 hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 animate-pulse-slow"
+    </section>
+
+    <!-- Growth Hacks & Insights Section -->
+    <section class="py-20 bg-white section overflow-hidden">
+      <div class="container mx-auto px-4 text-center">
+        <h2
+          class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-green-500"
         >
-          Start the Challenge
-        </button>
+          Growth Hacks <span class="text-orange-500">&</span> Insights
+        </h2>
+        <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
+          Discover expert tips to skyrocket your business success.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div
+            v-for="(tip, index) in tipsContent"
+            :key="index"
+            class="tip-card card bg-white/80 backdrop-blur-lg p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative group"
+          >
+            <img
+              v-if="index === 0"
+              src="../assets/img/Boost-map.jpg"
+              alt="Boost Google Maps"
+              class="w-full h-48 object-cover rounded-xl mb-6"
+              loading="lazy"
+            />
+            <img
+              v-if="index === 1"
+              src="../assets/img/boost2.jpg"
+              alt="Effective Flyers"
+              class="w-full h-48 rounded-xl mb-6"
+              loading="lazy"
+            />
+            <img
+              v-if="index === 2"
+              src="../assets/img/ads.jpg"
+              alt="Ad Campaign Strategies"
+              class="w-full h-48 object-cover rounded-xl mb-6"
+              loading="lazy"
+            />
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">{{ tip.title }}</h3>
+            <p class="text-gray-600 mb-6">{{ tip.description }}</p>
+            <p class="tip-note text-gray-500 text-sm opacity-0">{{ tip.note }}</p>
+          </div>
+        </div>
+        <a
+          href="#discover-more"
+          class="mt-8 inline-block bg-orange-500 text-white px-8 py-4 rounded-full hover:bg-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+        >
+          Discover More
+        </a>
       </div>
-    </div>
-    <div class="absolute -top-12 -left-12 w-32 h-32 bg-green-200/20 rounded-full blur-xl opacity-50 animate-blob"></div>
-    <div class="absolute -bottom-12 -right-12 w-40 h-40 bg-orange-200/20 rounded-full blur-xl opacity-50 animate-blob delay-2000"></div>
-  </div>
-</section>
+    </section>
+ <section>      <BeforeAfterSlider /></section>
+    <!-- FAQ Section -->
+    <section class="py-20 bg-gradient-to-b from-white to-orange-50 section overflow-hidden">
+      <div class="container mx-auto px-4 text-center relative">
+        <h2
+          class="text-4xl md:text-5xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-green-600 animate-pulse-slow drop-shadow-lg"
+        >
+          Your Questions, Answered
+        </h2>
+        <p class="text-lg md:text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
+          Find answers to common questions or ask us directly for personalized support.
+        </p>
+        <div class="max-w-5xl mx-auto">
+          <div class="flex flex-col md:flex-row justify-between gap-6">
+            <!-- Left Column (3 FAQs) -->
+            <div class="w-full md:w-1/2 space-y-2">
+              <div
+                v-for="(faq, index) in faqQuestions.slice(0, 3)"
+                :key="index"
+                class="card bg-white/90 backdrop-blur-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-102"
+              >
+                <button
+                  @click="toggleFAQ(index + 1)"
+                  class="w-full text-left p-6 text-gray-900 font-semibold text-lg focus:outline-none flex justify-between items-center hover:bg-orange-50/50 transition-colors duration-300"
+                  :aria-expanded="faqOpen === index + 1"
+                  :aria-controls="'faq-' + index"
+                >
+                  <span>{{ faq.question }}</span>
+                  <span
+                    :class="{ 'rotate-180': faqOpen === index + 1 }"
+                    class="transform transition-transform duration-300"
+                  >
+                    <svg
+                      class="w-6 h-6 text-orange-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </span>
+                </button>
+                <transition name="faq-slide">
+                  <div
+                    v-if="faqOpen === index + 1"
+                    :id="'faq-' + index"
+                    class="p-6 text-gray-700 bg-gradient-to-b from-white to-gray-50"
+                  >
+                    {{ faq.answer }}
+                  </div>
+                </transition>
+              </div>
+            </div>
+            <!-- Right Column (3 FAQs) -->
+            <div class="w-full md:w-1/2 space-y-2">
+              <div
+                v-for="(faq, index) in faqQuestions.slice(3, 6)"
+                :key="index + 3"
+                class="card bg-white/90 backdrop-blur-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-102"
+              >
+                <button
+                  @click="toggleFAQ(index + 4)"
+                  class="w-full text-left p-6 text-gray-900 font-semibold text-lg focus:outline-none flex justify-between items-center hover:bg-orange-50/50 transition-colors duration-300"
+                  :aria-expanded="faqOpen === index + 4"
+                  :aria-controls="'faq-' + (index + 3)"
+                >
+                  <span>{{ faq.question }}</span>
+                  <span
+                    :class="{ 'rotate-180': faqOpen === index + 4 }"
+                    class="transform transition-transform duration-300"
+                  >
+                    <svg
+                      class="w-6 h-6 text-orange-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </span>
+                </button>
+                <transition name="faq-slide">
+                  <div
+                    v-if="faqOpen === index + 4"
+                    :id="'faq-' + (index + 3)"
+                    class="p-6 text-gray-700 bg-gradient-to-b from-white to-gray-50"
+                  >
+                    {{ faq.answer }}
+                  </div>
+                </transition>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </section>
 
     <!-- Footer -->
-    <footer class="bg-gradient-to-b from-gray-900 to-gray-800 text-white py-12 section">
-      <div class="container mx-auto px-4">
+    <footer class="bg-gradient-to-b from-gray-900 to-gray-800 bg-orange-300 py-12 section">      <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div class="text-center md:text-left">
             <img
               src="@/assets/img/logo.svg"
               alt="Growlix Logo"
               class="w-20 h-auto mx-auto md:mx-0 mb-6"
-            />
-            <p class="text-gray-300 mb-4">Growlix: Empowering Your Business to Thrive Online</p>
+            />  
+            <p class=" mb-4">Growlix: Empowering Your Business to Thrive Online</p>
             <div class="flex justify-center md:justify-start space-x-6 sm:space-x-8">
               <a
                 href="https://facebook.com/growlix"
@@ -915,29 +768,25 @@ onUnmounted(() => {
                 <RouterLink
                   to="/about"
                   class="text-gray-300 hover:text-orange-500 transition-colors duration-300"
-                  >About Us</RouterLink
-                >
+                >About Us</RouterLink>
               </li>
               <li>
                 <RouterLink
                   to="/services"
                   class="text-gray-300 hover:text-orange-500 transition-colors duration-300"
-                  >Services</RouterLink
-                >
+                >Services</RouterLink>
               </li>
               <li>
                 <RouterLink
                   to="/pricing"
                   class="text-gray-300 hover:text-orange-500 transition-colors duration-300"
-                  >Pricing</RouterLink
-                >
+                >Pricing</RouterLink>
               </li>
               <li>
                 <RouterLink
                   to="/blog"
                   class="text-gray-300 hover:text-orange-500 transition-colors duration-300"
-                  >Blog</RouterLink
-                >
+                >Blog</RouterLink>
               </li>
             </ul>
           </div>
@@ -945,6 +794,7 @@ onUnmounted(() => {
             <h3 class="text-xl font-semibold text-white mb-6">Newsletter</h3>
             <form @submit.prevent="submitNewsletter" class="max-w-md mx-auto">
               <input
+                v-model="formData.email"
                 type="email"
                 placeholder="Subscribe to our newsletter"
                 class="w-full p-4 rounded-full text-gray-900 focus:outline-none focus:ring-4 focus:ring-orange-300/50 bg-white/90 backdrop-blur-sm border-2 border-orange-300/50 placeholder-gray-500 mb-4"
@@ -956,11 +806,11 @@ onUnmounted(() => {
                 Subscribe
               </button>
             </form>
-            <p v-if="formSuccess.value" class="mt-4 text-green-600 font-semibold text-lg">
-              {{ formSuccess.value }}
+            <p v-if="formSuccess" class="mt-4 text-green-600 font-semibold text-lg">
+              {{ formSuccess }}
             </p>
-            <p v-if="formError.value" class="mt-4 text-red-600 font-semibold text-lg">
-              {{ formError.value }}
+            <p v-if="formError" class="mt-4 text-red-600 font-semibold text-lg">
+              {{ formError }}
             </p>
           </div>
         </div>
@@ -989,9 +839,11 @@ onUnmounted(() => {
   }
 }
 
-
 /* Glassmorphism effect */
-
+.backdrop-blur-lg {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
 
 /* Button micro-interactions */
 button,
@@ -1025,11 +877,20 @@ html {
 }
 
 /* Lazy-loaded images */
+img[loading="lazy"] {
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+}
 
+img[loading="lazy"][src] {
+  opacity: 1;
+}
 
 /* Tip note styling */
 .tip-note {
   transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(10px);
 }
 
 /* Enhanced animations */
@@ -1060,16 +921,9 @@ html {
 
 /* Responsive adjustments */
 @media (max-width: 640px) {
-  .bg-white { padding: 6; }
+  .bg-white { padding: 6px; }
   h3 { font-size: 1.5rem; }
   p { font-size: 0.95rem; }
-}
-.animate-pulse-slow {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.85; }
 }
 
 /* FAQ slide transition */
@@ -1085,18 +939,11 @@ html {
   transform: translateY(-10px);
 }
 
-/* Glassmorphism effect */
-.backdrop-blur-lg {
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .flex-row {
     flex-direction: column;
   }
-
   h2 {
     font-size: 2.5rem;
   }
