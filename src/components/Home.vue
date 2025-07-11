@@ -81,12 +81,6 @@ const testimonials = ref([
   },
 ])
 
-// Founder data (just you)
-const founder = ref({
-  name: 'Your Name',
-  role: 'Founder & Creator',
-  image: 'https://via.placeholder.com/150', // Replace with your actual image URL
-})
 
 // Tips data with hover notes
 const tipsContent = ref([
@@ -126,57 +120,40 @@ const tips = [
 ]
 
 const faqQuestions = ref([
+
   {
-    question: 'How do I get started?',
-    answer: 'Sign up on our platform, choose a plan, and our team will guide you through setup.',
+    question: 'What specific services does Growlix offer to help me grow my business significantly?',
+    answer: 'We provide Google Maps optimization, custom website development, social media ad campaigns, branding materials, and advanced analytics to drive your business growth.',
   },
   {
-    question: 'What’s included in each plan?',
-    answer: 'Check our pricing table for detailed features per plan.',
+    question: 'Is there a way to try Growlix services before committing to a long-term plan?',
+    answer: 'Yes, all our plans come with a 30-day money-back guarantee, allowing you to test our services risk-free and see the results for yourself.',
   },
   {
-    question: 'Can I upgrade my plan?',
-    answer: 'Yes, you can upgrade anytime via your dashboard.',
+    question: 'How does Growlix ensure the security of my business data during our collaboration?',
+    answer: 'We use enterprise-grade security measures and cybersecurity protocols to protect your data, ensuring it remains safe while we enhance your online growth.',
   },
+  {
+    question: 'Can I upgrade my Growlix plan if my business needs change over time?',
+    answer: 'Absolutely, you can upgrade your plan anytime through your dashboard, and our team will assist you in transitioning smoothly to meet your evolving needs.',
+  },
+  {
+    question: 'What kind of support can I expect from Growlix after I sign up for a plan?',
+    answer: 'You’ll receive dedicated support via email and chat, along with regular check-ins to ensure your growth strategies are on track and optimized.',
+  },
+  {
+    question: 'How quickly can I expect to see results after using Growlix services?',
+    answer: 'Our optimized strategies typically deliver noticeable improvements in your online visibility within a few weeks, depending on your starting point and plan.',
+  },
+
 ])
 
-const submitNewsletter = () => {
-  // Placeholder for newsletter submission logic
-  formError.value = ''
-  formSuccess.value = 'Subscribed successfully!'
-  setTimeout(() => (formSuccess.value = ''), 3000)
-}
 
-const submitForm = () => {
-  if (!formData.value.name || !formData.value.email || !formData.value.business) {
-    formError.value = 'Please fill in all fields.'
-    formSuccess.value = ''
-    return
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.value.email)) {
-    formError.value = 'Please enter a valid email.'
-    formSuccess.value = ''
-    return
-  }
-  formError.value = ''
-  formSuccess.value = 'Thank you! We’ll contact you soon.'
-  formData.value = { name: '', email: '', business: '' }
-}
 
 const toggleFAQ = (id) => {
   faqOpen.value = faqOpen.value === id ? null : id
 }
 
-const submitQuestion = () => {
-  question.value = ''
-  questionSubmitted.value = true
-  gsap.fromTo(
-    '.question-feedback',
-    { opacity: 0, y: 20 },
-    { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' },
-  )
-  setTimeout(() => (questionSubmitted.value = false), 3000)
-}
 
 const showRandomTip = () => {
   randomTip.value = tips[Math.floor(Math.random() * tips.length)]
@@ -190,18 +167,18 @@ const showRandomTip = () => {
 // Quiz logic
 const questions = ref([
   {
-    text: 'What’s the best ad platform for local reach?',
-    options: ['Facebook', 'Google', 'Instagram', 'X'],
+    text: 'Which platform is best for targeting local customers?',
+    options: ['Facebook', 'Google Ads', 'Instagram', 'X'],
     answer: 1,
   },
   {
-    text: 'How often should you update your website?',
+    text: 'How often should you update your website content?',
     options: ['Monthly', 'Quarterly', 'Yearly', 'Never'],
     answer: 0,
   },
   {
-    text: 'Which improves SEO the most?',
-    options: ['Images', 'Keywords', 'Colors', 'Fonts'],
+    text: 'What’s the most effective SEO strategy?',
+    options: ['Frequent Images', 'Keyword Optimization', 'Bright Colors', 'Large Fonts'],
     answer: 1,
   },
 ])
@@ -214,21 +191,11 @@ const startQuiz = () => {
     currentQuestion.value = 0
     selectedAnswer.value = null
     score.value = null
-    gsap.fromTo(
-      '.quiz-container',
-      { opacity: 0, scale: 0.95 },
-      { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(1.7)' },
-    )
   }
 }
 
 const selectAnswer = (index) => {
   selectedAnswer.value = index
-  gsap.fromTo(
-    `.answer-${index}`,
-    { scale: 0.95 },
-    { scale: 1, duration: 0.3, ease: 'elastic.out(1, 0.3)' },
-  )
 }
 
 const nextQuestion = () => {
@@ -657,7 +624,7 @@ onUnmounted(() => {
     <h2
       class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-green-500"
     >
-      Growth Hacks & Insights
+      Growth Hacks <span class="text-orange-500">&</span>  Insights
     </h2>
     <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
       Discover expert tips to skyrocket your business success.
@@ -704,19 +671,22 @@ onUnmounted(() => {
 </section>
 
     <!-- FAQ Section -->
-    <section class="py-20 bg-gradient-to-b from-white to-orange-50 section">
-      <div class="container mx-auto px-4 text-center">
-        <h2
-          class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-green-500"
-        >
-          Your Questions, Answered
-        </h2>
-        <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
-          Find answers to common questions or ask us directly for personalized support.
-        </p>
-        <div class="max-w-3xl mx-auto space-y-4">
+<section class="py-20 bg-gradient-to-b from-white to-orange-50 section overflow-hidden">
+  <div class="container mx-auto px-4 text-center relative">
+    <h2
+      class="text-4xl md:text-5xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-green-600 animate-pulse-slow drop-shadow-lg"
+    >
+      Your Questions, Answered
+    </h2>
+    <p class="text-lg md:text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
+      Find answers to common questions or ask us directly for personalized support.
+    </p>
+    <div class="max-w-5xl mx-auto">
+      <div class="flex flex-col md:flex-row justify-between gap-6">
+        <!-- Left Column (3 FAQs) -->
+        <div class="w-full md:w-1/2 space-y-2">
           <div
-            v-for="(faq, index) in faqQuestions"
+            v-for="(faq, index) in faqQuestions.slice(0, 3)"
             :key="index"
             class="card bg-white/90 backdrop-blur-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-102"
           >
@@ -757,118 +727,142 @@ onUnmounted(() => {
             </transition>
           </div>
         </div>
-        <form
-          @submit.prevent="submitQuestion"
-          class="mt-12 max-w-xl mx-auto flex flex-col sm:flex-row items-center gap-4"
-        >
-          <input
-            v-model="question"
-            type="text"
-            placeholder="Ask a question"
-            class="w-full p-4 rounded-full text-gray-900 focus:outline-none focus:ring-4 focus:ring-orange-300/50 bg-white/90 backdrop-blur-sm border-2 border-orange-300/50 placeholder-gray-500"
-          />
-          <button
-            type="submit"
-            class="bg-gradient-to-r from-orange-500 to-green-500 text-white px-8 py-4 rounded-full hover:from-orange-600 hover:to-green-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 animate-pulse"
-          >
-            Ask Now
-          </button>
-        </form>
-        <p
-          v-if="questionSubmitted"
-          class="question-feedback mt-6 text-green-600 font-semibold text-lg"
-        >
-          Thank you! We’ll get back to you soon.
-        </p>
-      </div>
-    </section>
-
-    <!-- Business Growth Quiz Section -->
-    <section class="py-20 bg-gradient-to-b from-orange-50 to-green-50 section">
-      <div class="container mx-auto px-4 text-center">
-        <h2
-          class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-green-500"
-        >
-          Boost Your Business IQ
-        </h2>
-        <p class="text-lg text-gray-600 mb-12 max-w-xl mx-auto">
-          Take our fun quiz to test your growth knowledge and unlock expert tips!
-        </p>
-        <div
-          class="quiz-container max-w-xl mx-auto bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-2xl transform hover:scale-102 transition-all duration-300"
-        >
+        <!-- Right Column (3 FAQs) -->
+        <div class="w-full md:w-1/2 space-y-2">
           <div
-            v-if="currentQuestion !== null && questions.value[currentQuestion.value]"
-            class="space-y-6"
+            v-for="(faq, index) in faqQuestions.slice(3, 6)"
+            :key="index + 3"
+            class="card bg-white/90 backdrop-blur-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-102"
           >
-            <p class="text-2xl text-gray-900 font-semibold mb-6">
-              {{ questions.value[currentQuestion.value].text }}
-            </p>
-            <div class="grid grid-cols-1 gap-4">
-              <button
-                v-for="(option, index) in questions.value[currentQuestion.value].options"
-                :key="index"
-                @click="selectAnswer(index)"
-                :class="`answer-${index} w-full bg-gray-100 text-gray-900 px-6 py-4 rounded-xl hover:bg-orange-100 transition-all duration-300 flex items-center justify-between ${selectedAnswer.value === index ? 'bg-green-500 text-white hover:bg-green-600' : ''}`"
+            <button
+              @click="toggleFAQ(index + 4)"
+              class="w-full text-left p-6 text-gray-900 font-semibold text-lg focus:outline-none flex justify-between items-center hover:bg-orange-50/50 transition-colors duration-300"
+              :aria-expanded="faqOpen === index + 4"
+              :aria-controls="'faq-' + (index + 3)"
+            >
+              <span>{{ faq.question }}</span>
+              <span
+                :class="{ 'rotate-180': faqOpen === index + 4 }"
+                class="transform transition-transform duration-300"
               >
-                <span>{{ option }}</span>
-                <span v-if="selectedAnswer.value === index">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </span>
-              </button>
-            </div>
-            <button
-              v-if="selectedAnswer.value !== null"
-              @click="nextQuestion"
-              class="mt-8 bg-gradient-to-r from-orange-500 to-green-500 text-white px-8 py-4 rounded-full hover:from-orange-600 hover:to-green-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 animate-pulse"
-            >
-              {{
-                currentQuestion.value === questions.value.length - 1
-                  ? 'See Results'
-                  : 'Next Question'
-              }}
+                <svg
+                  class="w-6 h-6 text-orange-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </span>
             </button>
-          </div>
-          <div
-            v-else-if="score !== null && score.value !== null"
-            class="space-y-6"
-            data-v-inspector="src/components/Home.vue:677:11"
-          >
-            <p class="text-4xl font-bold text-gray-900 mb-6">
-              Your Score: {{ score.value }} / {{ questions.value.length }}
-            </p>
-            <p class="text-lg text-gray-600 mb-6">
-              {{
-                score.value === questions.value.length
-                  ? 'Perfect score! You’re a growth guru!'
-                  : 'Great effort! Let’s grow even more with Growlix!'
-              }}
-            </p>
-            <RouterLink
-              to="/signup"
-              class="bg-gradient-to-r from-orange-500 to-green-500 text-white px-8 py-4 rounded-full hover:from-orange-600 hover:to-green-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 animate-pulse"
-            >
-              Start Growing Now
-            </RouterLink>
-          </div>
-          <div v-else>
-            <button
-              @click="startQuiz"
-              class="bg-gradient-to-r from-orange-500 to-green-500 text-white px-8 py-4 rounded-full hover:from-orange-600 hover:to-green-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 animate-pulse"
-            >
-              Start the Challenge
-            </button>
+            <transition name="faq-slide">
+              <div
+                v-if="faqOpen === index + 4"
+                :id="'faq-' + (index + 3)"
+                class="p-6 text-gray-700 bg-gradient-to-b from-white to-gray-50"
+              >
+                {{ faq.answer }}
+              </div>
+            </transition>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
+
+    <!-- Business Growth Quiz Section -->
+<section class="py-24 bg-gradient-to-b from-orange-50 to-green-50 section overflow-hidden">
+  <div class="container mx-auto px-4 text-center relative">
+    <h2
+      class="text-4xl md:text-5xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-green-600 animate-fade-in drop-shadow-md"
+    >
+      Boost Your Business IQ
+    </h2>
+    <p class="text-lg md:text-xl text-gray-700 mb-12 max-w-xl mx-auto font-light">
+      Take our fun quiz to test your growth knowledge and unlock expert tips!
+    </p>
+    <div
+      class="quiz-container max-w-2xl mx-auto bg-white/95 backdrop-blur-md p-6 md:p-10 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-orange-200/50"
+    >
+      <div
+        v-if="currentQuestion !== null && questions.value[currentQuestion.value]"
+        class="space-y-8"
+      >
+        <p class="text-2xl md:text-3xl text-gray-900 font-semibold mb-6 animate-slide-up">
+          {{ questions.value[currentQuestion.value].text }}
+        </p>
+        <div class="grid grid-cols-1 gap-3">
+          <button
+            v-for="(option, index) in questions.value[currentQuestion.value].options"
+            :key="index"
+            @click="selectAnswer(index)"
+            :class="`answer-${index} w-full bg-gradient-to-r from-orange-100 to-green-100 text-gray-800 px-6 py-4 rounded-xl hover:from-orange-200 hover:to-green-200 transition-all duration-300 flex items-center justify-between transform hover:scale-105 ${selectedAnswer.value === index ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' : ''}`"
+          >
+            <span class="font-medium">{{ option }}</span>
+            <span v-if="selectedAnswer.value === index" class="flex-shrink-0">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </span>
+          </button>
+        </div>
+        <button
+          v-if="selectedAnswer.value !== null"
+          @click="nextQuestion"
+          class="w-full bg-gradient-to-r from-orange-500 to-green-500 text-white px-6 py-3 rounded-xl hover:from-orange-600 hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 animate-pulse-slow"
+        >
+          {{
+            currentQuestion.value === questions.value.length - 1
+              ? 'See Results'
+              : 'Next Question'
+          }}
+        </button>
+      </div>
+      <div
+        v-else-if="score !== null && score.value !== null"
+        class="space-y-8 text-center"
+      >
+        <p class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 animate-pop-in">
+          Your Score: {{ score.value }} / {{ questions.value.length }}
+        </p>
+        <p class="text-lg md:text-xl text-gray-700 mb-6 animate-fade-in-delay">
+          {{
+            score.value === questions.value.length
+              ? 'Perfect score! You’re a growth guru!'
+              : 'Great effort! Let’s grow even more with Growlix!'
+          }}
+        </p>
+        <RouterLink
+          to="/signup"
+          class="inline-block bg-gradient-to-r from-orange-500 to-green-500 text-white px-6 py-3 rounded-xl hover:from-orange-600 hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 animate-pulse-slow"
+        >
+          Start Growing Now
+        </RouterLink>
+      </div>
+      <div v-else class="text-center">
+        <button
+          @click="startQuiz"
+          class="bg-gradient-to-r from-orange-500 to-green-500 text-white px-6 py-3 rounded-xl hover:from-orange-600 hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 animate-pulse-slow"
+        >
+          Start the Challenge
+        </button>
+      </div>
+    </div>
+    <div class="absolute -top-12 -left-12 w-32 h-32 bg-green-200/20 rounded-full blur-xl opacity-50 animate-blob"></div>
+    <div class="absolute -bottom-12 -right-12 w-40 h-40 bg-orange-200/20 rounded-full blur-xl opacity-50 animate-blob delay-2000"></div>
+  </div>
+</section>
 
     <!-- Footer -->
     <footer class="bg-gradient-to-b from-gray-900 to-gray-800 text-white py-12 section">
@@ -995,19 +989,6 @@ onUnmounted(() => {
   }
 }
 
-/* FAQ slide transition */
-.faq-slide-enter-active,
-.faq-slide-leave-active {
-  transition: all 0.3s ease;
-  max-height: 200px;
-}
-
-.faq-slide-enter-from,
-.faq-slide-leave-to {
-  opacity: 0;
-  max-height: 0;
-  transform: translateY(-10px);
-}
 
 /* Glassmorphism effect */
 
@@ -1082,5 +1063,45 @@ html {
   .bg-white { padding: 6; }
   h3 { font-size: 1.5rem; }
   p { font-size: 0.95rem; }
+}
+.animate-pulse-slow {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+/* FAQ slide transition */
+.faq-slide-enter-active,
+.faq-slide-leave-active {
+  transition: all 0.3s ease;
+  max-height: 200px;
+}
+.faq-slide-enter-from,
+.faq-slide-leave-to {
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(-10px);
+}
+
+/* Glassmorphism effect */
+.backdrop-blur-lg {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .flex-row {
+    flex-direction: column;
+  }
+
+  h2 {
+    font-size: 2.5rem;
+  }
+  p {
+    font-size: 1rem;
+  }
 }
 </style>
