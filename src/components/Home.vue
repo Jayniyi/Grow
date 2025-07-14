@@ -1,8 +1,7 @@
-
 <script setup>
 import Navbar from '@/components/Navbar.vue'
 import HeroSection from '@/components/Hero.vue'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
 import { RouterLink } from 'vue-router'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
@@ -70,10 +69,10 @@ const plans = ref([
   },
 ])
 
-// Toggle between monthly and yearly pricing
+// Toggle pricing
 const isYearly = ref(false)
 
-// Testimonial data
+// Testimonials and tips
 const testimonials = ref([
   {
     name: 'A Happy Customer',
@@ -83,7 +82,6 @@ const testimonials = ref([
   },
 ])
 
-// Tips data with hover notes
 const tipsContent = ref([
   {
     title: '5 Tips to Boost Google Maps',
@@ -105,7 +103,7 @@ const tipsContent = ref([
   },
 ])
 
-// Form and FAQ state
+// Form state
 const formData = ref({ name: '', email: '', business: '' })
 const formError = ref('')
 const formSuccess = ref('')
@@ -114,36 +112,45 @@ const question = ref('')
 const questionSubmitted = ref(false)
 const randomTip = ref('')
 
+// Tips
 const tips = [
   'Update your Google Maps listing weekly to stay relevant.',
   'Use bold colors in flyers to grab attention.',
   'Test different ad platforms to find your best ROI.',
 ]
 
+// FAQs
 const faqQuestions = ref([
   {
-    question: 'What specific services does Growlix offer to help me grow my business significantly?',
-    answer: 'We provide Google Maps optimization, custom website development, social media ad campaigns, branding materials, and advanced analytics to drive your business growth.',
+    question:
+      'What specific services does Growlix offer to help me grow my business significantly?',
+    answer:
+      'We provide Google Maps optimization, custom website development, social media ad campaigns, branding materials, and advanced analytics to drive your business growth.',
   },
   {
     question: 'Is there a way to try Growlix services before committing to a long-term plan?',
-    answer: 'Yes, all our plans come with a 30-day money-back guarantee, allowing you to test our services risk-free and see the results for yourself.',
+    answer:
+      'Yes, all our plans come with a 30-day money-back guarantee, allowing you to test our services risk-free and see the results for yourself.',
   },
   {
     question: 'How does Growlix ensure the security of my business data during our collaboration?',
-    answer: 'We use enterprise-grade security measures and cybersecurity protocols to protect your data, ensuring it remains safe while we enhance your online growth.',
+    answer:
+      'We use enterprise-grade security measures and cybersecurity protocols to protect your data, ensuring it remains safe while we enhance your online growth.',
   },
   {
     question: 'Can I upgrade my Growlix plan if my business needs change over time?',
-    answer: 'Absolutely, you can upgrade your plan anytime through your dashboard, and our team will assist you in transitioning smoothly to meet your evolving needs.',
+    answer:
+      'Absolutely, you can upgrade your plan anytime through your dashboard, and our team will assist you in transitioning smoothly to meet your evolving needs.',
   },
   {
     question: 'What kind of support can I expect from Growlix after I sign up for a plan?',
-    answer: 'You’ll receive dedicated support via email and chat, along with regular check-ins to ensure your growth strategies are on track and optimized.',
+    answer:
+      'You’ll receive dedicated support via email and chat, along with regular check-ins to ensure your growth strategies are on track and optimized.',
   },
   {
     question: 'How quickly can I expect to see results after using Growlix services?',
-    answer: 'Our optimized strategies typically deliver noticeable improvements in your online visibility within a few weeks, depending on your starting point and plan.',
+    answer:
+      'Our optimized strategies typically deliver noticeable improvements in your online visibility within a few weeks, depending on your starting point and plan.',
   },
 ])
 
@@ -160,63 +167,92 @@ const showRandomTip = () => {
   )
 }
 
-// Scroll and hover animations
+// GSAP Animations
 onMounted(() => {
-  // Ensure BeforeAfterSlider persists by excluding it from ScrollTrigger animations
-  gsap.utils.toArray('.section:not(.carousel-section)').forEach((section) => {
-    gsap.from(section, {
-      opacity: 0,
-      y: 50,
-      duration: 0.8,
-      ease: 'power3.out',
-      scrollTrigger: {
-        trigger: section,
-        start: 'top 80%',
-        end: 'bottom 20%',
-        toggleActions: 'play none none none', // Changed to prevent reverse hiding
+  // Only animate sections that have the .fade-in class
+  gsap.utils.toArray('.fade-in').forEach((el, index) => {
+    gsap.fromTo(
+      section,
+      { opacity: 0, y: 30 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: section,
+          start: 'top 85%',
+          toggleActions: 'play none none none',
+        },
       },
-    })
+    )
   })
 
-  gsap.utils.toArray('.card').forEach((card, index) => {
-    gsap.from(card, {
-      opacity: 0,
-      x: index % 2 === 0 ? -100 : 100,
-      duration: 0.8,
-      delay: index * 0.2,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: card,
-        start: 'top 90%',
+  // Animate cards safely
+
+  const cards = gsap.utils.toArray('.card')
+  cards.forEach((card, i) => {
+    gsap.fromTo(
+      card,
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        delay: i * 0.15,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: card,
+          start: 'top 90%',
+          toggleActions: 'play none none none',
+        },
       },
-    })
+    )
   })
 
+  // Tip notes
   const tipCards = gsap.utils.toArray('.tip-card')
   tipCards.forEach((card) => {
     const note = card.querySelector('.tip-note')
-    const onEnter = () => gsap.to(note, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' })
-    const onLeave = () => gsap.to(note, { opacity: 0, y: 10, duration: 0.3, ease: 'power2.in' })
+    const onEnter = () => gsap.to(note, { opacity: 1, y: 0, duration: 0.3 })
+    const onLeave = () => gsap.to(note, { opacity: 0, y: 10, duration: 0.3 })
     card.addEventListener('mouseenter', onEnter)
     card.addEventListener('mouseleave', onLeave)
     card._gsapEvents = { onEnter, onLeave }
   })
 
-  // Ensure carousel persists on scroll
+  // Static animation for carousel
   gsap.from('.carousel-section', {
-    opacity: 1, // Keep visible
+    opacity: 1,
     duration: 0.8,
     ease: 'power3.out',
   })
-})
 
-onUnmounted(() => {
-  gsap.utils.toArray('.tip-card').forEach((card) => {
-    if (card._gsapEvents) {
-      card.removeEventListener('mouseenter', card._gsapEvents.onEnter)
-      card.removeEventListener('mouseleave', card._gsapEvents.onLeave)
-      delete card._gsapEvents
-    }
+  // .box animation
+  const boxAnim = gsap.to('.box', {
+    scrollTrigger: {
+      trigger: '.box',
+      start: 'top center',
+      toggleActions: 'play none none none',
+    },
+    opacity: 1,
+    y: 0,
+    duration: 1,
+  })
+
+  // Cleanup
+  onUnmounted(() => {
+    ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+
+    tipCards.forEach((card) => {
+      if (card._gsapEvents) {
+        card.removeEventListener('mouseenter', card._gsapEvents.onEnter)
+        card.removeEventListener('mouseleave', card._gsapEvents.onLeave)
+        delete card._gsapEvents
+      }
+    })
+
+    boxAnim.scrollTrigger?.kill()
   })
 })
 </script>
@@ -228,8 +264,7 @@ onUnmounted(() => {
     <HeroSection />
 
     <!-- Carousel Section -->
-    <section class="carousel-section py-20 bg-gradient-to-b from-white to-gray-50">
-    </section>
+    <section class="carousel-section py-20 bg-gradient-to-b from-white to-gray-50"></section>
 
     <!-- Platform Benefits Section -->
     <section class="py-20 bg-gradient-to-b from-white to-gray-50 section">
@@ -337,9 +372,9 @@ onUnmounted(() => {
               aria-pressed="isYearly"
             >
               Yearly Billing
-              <span
-                class="text-xs bg-green-600 text-white py-1 px-2 rounded-full ml-2"
-              >Save 5%</span>
+              <span class="text-xs bg-green-600 text-white py-1 px-2 rounded-full ml-2"
+                >Save 5%</span
+              >
             </button>
           </div>
         </div>
@@ -434,7 +469,7 @@ onUnmounted(() => {
     </section>
 
     <!-- Testimonials Section -->
-    <section class="py-20 bg-gradient-to-b from-white to-gray-50 section overflow-hidden">
+    <section class="py-20 bg-gradient-to-b from-white to-gray-50 section overflow-hidden fade-in">
       <div class="container mx-auto px-4 text-center">
         <h2
           class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-green-500"
@@ -446,15 +481,14 @@ onUnmounted(() => {
         </p>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           <div
-            class="card bg-white/80 backdrop-blur-lg p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative overflow-hidden group"
+            class="card bg-white/80 will-change-transform p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative overflow-hidden group"
           >
-            <div
-              class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden ring-orange-200/50"
-            >
+            <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden ring-orange-200/50">
               <img
                 src="../assets/img/fce.jpg"
                 alt="A Happy Customer"
                 class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
+                loading="lazy"
               />
             </div>
             <div class="text-center">
@@ -471,15 +505,14 @@ onUnmounted(() => {
             ></div>
           </div>
           <div
-            class="card bg-white/80 backdrop-blur-lg p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative overflow-hidden group"
+            class="card bg-white/80 will-change-transform p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative overflow-hidden group"
           >
-            <div
-              class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden ring-orange-200/50"
-            >
+            <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden ring-orange-200/50">
               <img
                 src="../assets/img/test1.jpg"
                 alt="Another Happy Customer"
                 class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
+                loading="lazy"
               />
             </div>
             <div class="text-center">
@@ -496,11 +529,9 @@ onUnmounted(() => {
             ></div>
           </div>
           <div
-            class="card bg-white/80 backdrop-blur-lg p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative overflow-hidden group"
+            class="card bg-white/80  p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative overflow-hidden group"
           >
-            <div
-              class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden ring-orange-200/50"
-            >
+            <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden ring-orange-200/50">
               <img
                 src="../assets/img/test2.jpg"
                 alt="Satisfied Entrepreneur"
@@ -526,7 +557,9 @@ onUnmounted(() => {
     </section>
 
     <!-- About the Founder Section -->
-    <section class="py-20 bg-gradient-to-b from-gray-900 to-gray-700 text-white section overflow-hidden">
+    <section
+      class="py-20 bg-gradient-to-b from-gray-900 to-gray-700 text-white section overflow-hidden"
+    >
       <div class="container mx-auto px-4 text-center relative">
         <h2 class="text-3xl md:text-4xl font-bold mb-8 text-orange-500 animate-fade-in">
           The Visionary Behind Growlix
@@ -540,12 +573,16 @@ onUnmounted(() => {
                 src="../assets/img/ceo.jpg"
                 alt="Founder"
                 class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-300"
+                loading="lazy"
               />
             </div>
             <h3 class="text-gray-600 text-xl md:text-2xl font-bold mb-2">Obasan Joseph Olaniyi</h3>
             <p class="text-gray-600 mb-3">Developer & Cybersecurity Enthusiast</p>
             <p class="text-gray-800 text-sm md:text-base leading-relaxed">
-              As a Computer Science graduate, I’m channeling my expertise into Growlix, blending innovative development skills with a growing focus on cybersecurity. My mission is to secure and empower businesses with cutting-edge growth tools, making success accessible and safe for all.
+              As a Computer Science graduate, I’m channeling my expertise into Growlix, blending
+              innovative development skills with a growing focus on cybersecurity. My mission is to
+              secure and empower businesses with cutting-edge growth tools, making success
+              accessible and safe for all.
             </p>
           </div>
         </div>
@@ -555,8 +592,12 @@ onUnmounted(() => {
         >
           Discover My Journey
         </RouterLink>
-        <div class="absolute -top-8 -left-8 w-40 h-40 bg-green-400/10 rounded-full blur-xl opacity-50 animate-blob"></div>
-        <div class="absolute -bottom-8 -right-8 w-52 h-52 bg-orange-400/10 rounded-full blur-xl opacity-50 animate-blob delay-2000"></div>
+        <div
+          class="absolute -top-8 -left-8 w-40 h-40 bg-green-400/10 rounded-full blur-xl opacity-50 animate-blob"
+        ></div>
+        <div
+          class="absolute -bottom-8 -right-8 w-52 h-52 bg-orange-400/10 rounded-full blur-xl opacity-50 animate-blob delay-2000"
+        ></div>
       </div>
     </section>
 
@@ -575,7 +616,7 @@ onUnmounted(() => {
           <div
             v-for="(tip, index) in tipsContent"
             :key="index"
-            class="tip-card card bg-white/80 backdrop-blur-lg p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative group"
+            class="tip-card card bg-white/80 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative group"
           >
             <img
               v-if="index === 0"
@@ -611,7 +652,7 @@ onUnmounted(() => {
         </a>
       </div>
     </section>
- <section>      <BeforeAfterSlider /></section>
+    <section><BeforeAfterSlider /></section>
     <!-- FAQ Section -->
     <section class="py-20 bg-gradient-to-b from-white to-orange-50 section overflow-hidden">
       <div class="container mx-auto px-4 text-center relative">
@@ -630,7 +671,7 @@ onUnmounted(() => {
               <div
                 v-for="(faq, index) in faqQuestions.slice(0, 3)"
                 :key="index"
-                class="card bg-white/90 backdrop-blur-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-102"
+                class="card bg-white/90  rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-102"
               >
                 <button
                   @click="toggleFAQ(index + 1)"
@@ -674,7 +715,7 @@ onUnmounted(() => {
               <div
                 v-for="(faq, index) in faqQuestions.slice(3, 6)"
                 :key="index + 3"
-                class="card bg-white/90 backdrop-blur-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-102"
+                class="card bg-white/90  rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-102"
               >
                 <button
                   @click="toggleFAQ(index + 4)"
@@ -716,18 +757,20 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
-      </section>
+    </section>
 
     <!-- Footer -->
-    <footer class="bg-gradient-to-b from-gray-900 to-gray-800 bg-orange-300 py-12 section">      <div class="container mx-auto px-4">
+    <footer class="bg-gradient-to-b from-gray-900 to-gray-800 bg-orange-300 py-12 section">
+      <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div class="text-center md:text-left">
             <img
               src="@/assets/img/logo.svg"
               alt="Growlix Logo"
               class="w-20 h-auto mx-auto md:mx-0 mb-6"
-            />  
-            <p class=" mb-4">Growlix: Empowering Your Business to Thrive Online</p>
+              loading="lazy"
+            />
+            <p class="mb-4">Growlix: Empowering Your Business to Thrive Online</p>
             <div class="flex justify-center md:justify-start space-x-6 sm:space-x-8">
               <a
                 href="https://facebook.com/growlix"
@@ -768,25 +811,29 @@ onUnmounted(() => {
                 <RouterLink
                   to="/about"
                   class="text-gray-300 hover:text-orange-500 transition-colors duration-300"
-                >About Us</RouterLink>
+                  >About Us</RouterLink
+                >
               </li>
               <li>
                 <RouterLink
                   to="/services"
                   class="text-gray-300 hover:text-orange-500 transition-colors duration-300"
-                >Services</RouterLink>
+                  >Services</RouterLink
+                >
               </li>
               <li>
                 <RouterLink
                   to="/pricing"
                   class="text-gray-300 hover:text-orange-500 transition-colors duration-300"
-                >Pricing</RouterLink>
+                  >Pricing</RouterLink
+                >
               </li>
               <li>
                 <RouterLink
                   to="/blog"
                   class="text-gray-300 hover:text-orange-500 transition-colors duration-300"
-                >Blog</RouterLink>
+                  >Blog</RouterLink
+                >
               </li>
             </ul>
           </div>
@@ -797,7 +844,7 @@ onUnmounted(() => {
                 v-model="formData.email"
                 type="email"
                 placeholder="Subscribe to our newsletter"
-                class="w-full p-4 rounded-full text-gray-900 focus:outline-none focus:ring-4 focus:ring-orange-300/50 bg-white/90 backdrop-blur-sm border-2 border-orange-300/50 placeholder-gray-500 mb-4"
+                class="w-full p-4 rounded-full text-gray-900 focus:outline-none focus:ring-4 focus:ring-orange-300/50 bg-white/90 border-2 border-orange-300/50 placeholder-gray-500 mb-4"
               />
               <button
                 type="submit"
@@ -840,10 +887,7 @@ onUnmounted(() => {
 }
 
 /* Glassmorphism effect */
-.backdrop-blur-lg {
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
+
 
 /* Button micro-interactions */
 button,
@@ -877,12 +921,12 @@ html {
 }
 
 /* Lazy-loaded images */
-img[loading="lazy"] {
+img[loading='lazy'] {
   transition: opacity 0.3s ease-in-out;
   opacity: 0;
 }
 
-img[loading="lazy"][src] {
+img[loading='lazy'][src] {
   opacity: 1;
 }
 
@@ -905,25 +949,49 @@ img[loading="lazy"][src] {
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
 }
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
 @keyframes blob {
-  0% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(20px, 20px) scale(1.1); }
-  66% { transform: translate(-20px, -20px) scale(0.9); }
-  100% { transform: translate(0, 0) scale(1); }
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(20px, 20px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, -20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
 }
 
 /* Responsive adjustments */
 @media (max-width: 640px) {
-  .bg-white { padding: 6px; }
-  h3 { font-size: 1.5rem; }
-  p { font-size: 0.95rem; }
+  .bg-white {
+    padding: 6px;
+  }
+  h3 {
+    font-size: 1.5rem;
+  }
+  p {
+    font-size: 0.95rem;
+  }
 }
 
 /* FAQ slide transition */
